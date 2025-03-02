@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { connection } from "@/lib/constants";
 import { db } from "@/db";
-import { shops, payments } from "@/db/schema";
+import { shops } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export const GET = async (_request: NextRequest) => {

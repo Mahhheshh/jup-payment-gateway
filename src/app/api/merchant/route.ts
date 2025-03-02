@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 
-import { users } from "@/db/schema";
+// import { users } from "@/db/schema";
 import { db } from "@/db";
 import { z } from "zod";
+
 export const GET = async (request: NextRequest) => {
   try {
     const searchParams = request.nextUrl.searchParams;

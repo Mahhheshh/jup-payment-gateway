@@ -17,7 +17,7 @@ export default function Redirect({ redirectTo }: RedirectProps) {
         setTimeout(() => {
             router.push(redirectTo);
         }, 5000);
-    }, [redirectTo])
+    }, [router, redirectTo])
 
     return (
         <div className="flex flex-col min-h-screen items-center justify-center p-6">

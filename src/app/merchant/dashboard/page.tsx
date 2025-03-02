@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// import { useForm } from "react-hook-form";
-// import { zodResolver } from "@hookform/resolvers/zod";
 import { useMerchant, getMerchantById, Merchant } from "@/hooks/use-merchant";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -15,7 +13,6 @@ import {
     Edit2,
     X,
     Save,
-    BadgeCheck,
     Tag,
     DollarSign,
     BarChart2,
@@ -24,14 +21,6 @@ import {
     Coins,
 } from "lucide-react";
 
-// import {
-//     Form,
-//     FormControl,
-//     FormField,
-//     FormItem,
-//     FormLabel,
-//     FormMessage,
-// } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,17 +33,12 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 
-// import { useParams } from "next/navigation";
-// import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-// import { Separator } from "@radix-ui/react-select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-// import { Label } from "@/components/ui/label";
-// import { cn } from "@/lib/utils";
 
 const profileFormSchema = z.object({
     businessName: z.string().min(2, { message: "Business name must be at least 2 characters" }),
@@ -108,7 +92,7 @@ export default function MerchantDashboardPage() {
                 // In a real application, these would be API calls
                 setTimeout(() => {
                     const mockMerchant = {
-                        id: 'merchant-1',
+                        id: 1,
                         solanaPublicKey: "",
                         businessName: 'Crypto Coffee Shop',
                         description: 'We serve the best coffee in town, now accepting crypto payments!',
@@ -274,7 +258,7 @@ export default function MerchantDashboardPage() {
                                     Share Profile
                                 </Button>
 
-                                <Link href={merchant?.id || "#"}>
+                                <Link href={`${merchant?.id}` || "1"}>
                                     <Button
                                         variant="outline"
                                         className="rounded-full px-5 py-2 border-2 shadow-sm hover:shadow transition-all gap-2 border-slate-200 hover:border-slate-300"
