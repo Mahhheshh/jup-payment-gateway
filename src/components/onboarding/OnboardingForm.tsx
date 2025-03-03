@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { businessInfoSchema, paymentDetailsSchema, BusinessInfoValues, PaymentDetailsValues, solanaAddressRegex } from "@/lib/validations";
@@ -19,6 +19,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import Redirect from "../redirect";
+import { useRouter } from "next/navigation";
 
 const BusinessInfoForm = () => {
     const { data, updateBusinessInfo } = useOnboarding();
@@ -217,38 +219,60 @@ const PaymentDetailsForm = () => {
 const ProgressIndicator = ({ currentStep }: { currentStep: number }) => {
     const steps = ["Business Information", "Payment Details"];
 
+    const getStepStyles = (index: number) => {
+        const isCurrentStep = index + 1 === currentStep;
+        const isPreviousStep = index + 1 < currentStep;
+
+        return {
+            step: `rounded-full flex items-center justify-center w-10 h-10 ${isCurrentStep
+                ? "bg-primary text-primary-foreground"
+                : isPreviousStep
+                    ? "bg-primary/20 text-primary"
+                    : "bg-secondary text-secondary-foreground"
+                }`,
+            connector: `w-20 h-0.5 mx-2 ${isPreviousStep ? "bg-primary" : "bg-secondary"
+                }`
+        };
+    };
+
     return (
         <div className="flex justify-center mb-8">
-            {steps.map((step, index) => (
-                <div key={step} className="flex items-center">
-                    <div
-                        className={`rounded-full flex items-center justify-center w-10 h-10 ${index + 1 === currentStep
-                            ? "bg-primary text-primary-foreground"
-                            : index + 1 < currentStep
-                                ? "bg-primary/20 text-primary"
-                                : "bg-secondary text-secondary-foreground"
-                            }`}
-                    >
-                        {index + 1 < currentStep ? (
-                            <CheckCircle className="h-5 w-5" />
-                        ) : (
-                            <span>{index + 1}</span>
+            {steps.map((step, index) => {
+                const styles = getStepStyles(index);
+                return (
+                    <div key={step} className="flex items-center">
+                        <div className={styles.step}>
+                            {index + 1 < currentStep ? (
+                                <CheckCircle className="h-5 w-5" />
+                            ) : (
+                                <span>{index + 1}</span>
+                            )}
+                        </div>
+
+                        {index < steps.length - 1 && (
+                            <div className={styles.connector} />
                         )}
                     </div>
-
-                    {index < steps.length - 1 && (
-                        <div
-                            className={`w-20 h-0.5 mx-2 ${index + 1 < currentStep ? "bg-primary" : "bg-secondary"}`}
-                        />
-                    )}
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 };
 
-const OnboardingForm = () => {
-    const { data } = useOnboarding();
+const OnboardingForm = ({ userId }: { userId: string }) => {
+    const { setUserId, data } = useOnboarding();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!userId) return;
+        setUserId(userId);
+    }, [userId]);
+
+    useEffect(() => {
+        if (data.isSubmitted) {
+            router.push("/merchant/dashboard");
+        }
+    }, [data.isSubmitted]);
 
     return (
         <Card className="w-full max-w-xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-xl border-white/20 dark:border-white/10 rounded-2xl">

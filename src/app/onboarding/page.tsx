@@ -13,6 +13,10 @@ export default async function Onboarding() {
         return <Redirect redirectTo="/auth" />
     }
 
+    if (session.user.shop) {
+        return <Redirect redirectTo="/merchant/dashboard" />
+    }
+
     return (
         <OnboardingProvider>
             <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -25,7 +29,7 @@ export default async function Onboarding() {
                         <span>Back to Home</span>
                     </Link>
 
-                    <OnboardingForm />
+                    <OnboardingForm userId={session.user.id} />
                 </div>
             </div>
         </OnboardingProvider>

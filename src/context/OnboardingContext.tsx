@@ -14,6 +14,7 @@ type PaymentDetails = {
 };
 
 type OnboardingData = {
+  userId: string;
   businessInfo: BusinessInfo;
   paymentDetails: PaymentDetails;
   step: number;
@@ -24,6 +25,7 @@ type OnboardingContextType = {
   data: OnboardingData;
   updateBusinessInfo: (info: Partial<BusinessInfo>) => void;
   updatePaymentDetails: (details: Partial<PaymentDetails>) => void;
+  setUserId: (userId: string) => void;
   nextStep: () => void;
   prevStep: () => void;
   setStep: (step: number) => void;
@@ -32,6 +34,7 @@ type OnboardingContextType = {
 };
 
 const initialState: OnboardingData = {
+  userId: "",
   businessInfo: {
     name: "",
     description: "",
@@ -49,6 +52,13 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(undef
 
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [data, setData] = useState<OnboardingData>(initialState);
+
+  const setUserId = (userId: string) => {
+    setData((prev) => ({
+      ...prev,
+      userId,
+    }));
+  };
 
   const updateBusinessInfo = (info: Partial<BusinessInfo>) => {
     setData((prev) => ({
@@ -94,13 +104,33 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const submitOnboarding = () => {
-    setData((prev) => ({
-      ...prev,
-      isSubmitted: true,
-    }));
-
-
-    console.log("Onboarding submitted:", data);
+    fetch('/api/merchant/new', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: data.userId,
+        businessName: data.businessInfo.name,
+        businessDescription: data.businessInfo.description,
+        solanaPubKey: data.paymentDetails.solanaPublicKey,
+        webhookUrl: data.paymentDetails.webhookUrl,
+      }),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to create merchant');
+        }
+        setData(prev => ({
+          ...prev,
+          isSubmitted: true
+        }));
+        return response.json();
+      })
+      .catch((error) => {
+        console.error('Error submitting onboarding:', error);
+      });
   };
 
   const reset = () => {
@@ -111,6 +141,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     <OnboardingContext.Provider
       value={{
         data,
+        setUserId,
         updateBusinessInfo,
         updatePaymentDetails,
         nextStep,
